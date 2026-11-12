@@ -1,0 +1,7 @@
+---
+# Empty by default: define only the accounts that should be managed.
+managed_users: []
+
+# Docker group membership grants root-equivalent access. Add users explicitly
+# only when that level of access is intended.
+docker_users: []

@@ -1,0 +1,25 @@
+---
+- name: Manage server user accounts
+  hosts: servers
+  become: true
+  tasks:
+    - name: Ensure configured users exist
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment | default(omit) }}"
+        shell: "{{ item.shell | default('/bin/bash') }}"
+        groups: "{{ item.groups | default(omit) }}"
+        append: "{{ item.append_groups | default(true) }}"
+        create_home: true
+        state: present
+      loop: "{{ managed_users }}"
+
+    - name: Install configured SSH public keys
+      ansible.posix.authorized_key:
+        user: "{{ item.name }}"
+        key: "{{ item.ssh_public_key }}"
+        state: present
+      loop: "{{ managed_users }}"
+      when:
+        - item.ssh_public_key is defined
+        - item.ssh_public_key | length > 0
