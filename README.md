@@ -1,29 +1,22 @@
 # Ansible infrastructure playbooks
 
-These playbooks install and enable Nginx and Docker, and manage explicitly
-configured user accounts on Ubuntu and Astra Linux hosts. Both distributions
-use Ansible's Debian-family package module; Docker is installed from the
-distribution's `docker.io` package.
+Данные плейбуки устанавливают и включают Nginx и Docker, а также управляют явно заданными учетными записями пользователей на серверах под управлением Ubuntu и Astra Linux. Оба дистрибутива используют пакетный модуль Ansible для семейства Debian; Docker устанавливается из пакета `docker.io`, входящего в состав дистрибутива.
 
-## Requirements
+## Требования
 
-- Ansible Core on the control machine
-- SSH access to the target hosts
-- `ansible.posix` collection for SSH authorized-key management:
+- Ansible Core на управляющей машине
+- SSH-доступ к целевым серверам
+- Коллекция `ansible.posix` для управления авторизованными SSH-ключами:
   `ansible-galaxy collection install ansible.posix`
-- A target account with sudo access
+- Учетная запись на целевом сервере с правами sudo
 
-## Configure inventory
+## Настройка инвентаря
 
-Edit `inventory/hosts.ini` and replace the example address and SSH user with
-your own. The address `192.0.2.10` is reserved for documentation and is not a
-real server.
+Отредактируйте `inventory/hosts.ini` и замените пример адреса и SSH-пользователя на свои. Адрес `192.0.2.10` зарезервирован для документации и не является реальным сервером.
 
-## Configure users
+## Настройка пользователей
 
-Set `managed_users` in `group_vars/all.yml` (or an environment-specific
-`group_vars` file) to the accounts you want Ansible to ensure exist. For
-example:
+Задайте `managed_users` в `group_vars/all.yml` (или в файле `group_vars` для конкретного окружения) — это список учетных записей, которые Ansible должен создать или проверить на наличие. Пример:
 
 ```yaml
 managed_users:
@@ -34,22 +27,18 @@ managed_users:
     ssh_public_key: "ssh-ed25519 AAAA... replace-with-your-public-key"
 ```
 
-Only public SSH keys belong here; do not store passwords or private keys in
-inventory. Omit `groups` if no supplementary groups should be configured.
-`docker_users` is empty by default. Membership in the Docker group grants
-root-equivalent access, so list accounts there only when that privilege is
-intended.
+Здесь должны быть только публичные SSH-ключи; Поле groups можно опустить, если дополнительные группы не нужны. Переменная docker_users по умолчанию пуста. Членство в группе Docker дает доступ, эквивалентный правам root, поэтому добавляйте туда учетные записи только если это действительно необходимо.
 
 ## Run
 
-Check connectivity and configuration first:
+Сначала проверьте подключение и конфигурацию:
 
 ```sh
 ansible all -m ansible.builtin.ping
 ansible-playbook --syntax-check playbooks/site.yml
 ```
 
-Run all playbooks or an individual playbook from this directory:
+Запуск всех плейбуков или отдельного плейбука из этой директории:
 
 ```sh
 ansible-playbook playbooks/site.yml --ask-become-pass
